@@ -58,6 +58,7 @@
           VERIFICATION_FAILED: "Verification failed. Please complete the challenge again.",
           TRY_LATER: "The service is busy. Please try again later.",
           SEND_FAILED: "Your message could not be sent. Please try again later.",
+          LOAD_FAILED: "Verification could not be loaded. Check your connection or content blockers, then reload this page.",
           GENERIC: "Something went wrong. Please try again.",
           SUCCESS: "Thank you. Your message has been sent."
         };
@@ -91,6 +92,15 @@
           setStatus(message, kind);
           resetChallenge();
         }
+
+        function loadFailed() {
+          if (widgetId === null) {
+            setStatus(MESSAGES.LOAD_FAILED, "error");
+          }
+        }
+        window.onTurnstileLoadError = loadFailed;
+        // Covers a script that hangs instead of failing outright.
+        window.setTimeout(loadFailed, 15000);
 
         window.onTurnstileLoad = function () {
           widgetId = window.turnstile.render("#widget", {
@@ -139,7 +149,7 @@
                 finish(MESSAGES.SUCCESS, "success", true);
               } else {
                 var code = result && result.code;
-                finish(MESSAGES[code] && code !== "GENERIC" && code !== "SUCCESS" ? MESSAGES[code] : MESSAGES.GENERIC, "error", false);
+                finish(MESSAGES[code] && ["INVALID_INPUT", "VERIFICATION_FAILED", "TRY_LATER", "SEND_FAILED"].indexOf(code) !== -1 ? MESSAGES[code] : MESSAGES.GENERIC, "error", false);
               }
             })
             .withFailureHandler(function () {
@@ -149,6 +159,6 @@
         });
       })();
     </script>
-    <script src="https://challenges.cloudflare.com/turnstile/v0/api.js?onload=onTurnstileLoad&amp;render=explicit" async defer></script>
+    <script src="https://challenges.cloudflare.com/turnstile/v0/api.js?onload=onTurnstileLoad&amp;render=explicit" async defer onerror="onTurnstileLoadError()"></script>
   </body>
 </html>

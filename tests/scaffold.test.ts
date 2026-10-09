@@ -97,6 +97,8 @@ test("form: safe rendering and submit-state handling", () => {
   assert.match(page, /withSuccessHandler/);
   assert.match(page, /withFailureHandler/);
   assert.match(page, /id="submit" type="submit" disabled/);
+  assert.match(page, /onerror="onTurnstileLoadError\(\)"/);
+  assert.match(page, /setTimeout\(loadFailed/);
   assert.match(page, /expired-callback/);
   assert.match(page, /error-callback/);
   assert.match(page, /role="status"/);
