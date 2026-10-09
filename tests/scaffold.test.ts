@@ -5,7 +5,9 @@ import { test } from "node:test";
 const source = new URL("../src/", import.meta.url);
 
 test("GAS manifest selects the V8 runtime", () => {
-  const manifest = JSON.parse(readFileSync(new URL("appsscript.json", source), "utf8"));
+  const manifest = JSON.parse(
+    readFileSync(new URL("appsscript.json", source), "utf8"),
+  );
   assert.equal(manifest.runtimeVersion, "V8");
 });
 
