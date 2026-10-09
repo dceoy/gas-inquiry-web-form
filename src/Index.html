@@ -1,14 +1,164 @@
 <!doctype html>
 <html lang="en">
   <head>
+    <base target="_top">
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Inquiry</title>
+    <style>
+      :root { color-scheme: light dark; font-family: system-ui, sans-serif; }
+      body { margin: 0; padding: 1rem; }
+      main { max-width: 36rem; margin: 0 auto; }
+      label { display: block; margin-top: 1rem; font-weight: 600; }
+      input, textarea { box-sizing: border-box; width: 100%; padding: 0.5rem; font: inherit; }
+      textarea { min-height: 10rem; resize: vertical; }
+      button { margin-top: 1rem; padding: 0.6rem 1.2rem; font: inherit; }
+      button:disabled { opacity: 0.6; cursor: not-allowed; }
+      .hp { position: absolute; left: -10000px; width: 1px; height: 1px; overflow: hidden; }
+      #widget { margin-top: 1rem; }
+      #status { margin-top: 1rem; min-height: 1.5rem; }
+      #status.error { color: #b00020; }
+      #status.success { color: #1b6e2d; }
+      @media (prefers-color-scheme: dark) {
+        #status.error { color: #ff8a80; }
+        #status.success { color: #81c995; }
+      }
+    </style>
   </head>
   <body>
-    <main>
+    <main id="app" data-sitekey="<?= siteKey ?>" data-action="<?= action ?>">
       <h1>Inquiry</h1>
-      <p>The inquiry form is under development.</p>
+      <form id="form" novalidate>
+        <label for="name">Name (optional)</label>
+        <input id="name" name="name" type="text" maxlength="100" autocomplete="name">
+
+        <label for="email">Email</label>
+        <input id="email" name="email" type="email" maxlength="320" required autocomplete="email">
+
+        <label for="subject">Subject</label>
+        <input id="subject" name="subject" type="text" maxlength="150" required>
+
+        <label for="message">Message</label>
+        <textarea id="message" name="message" maxlength="2000" required></textarea>
+
+        <div class="hp" aria-hidden="true">
+          <label for="website">Leave this field empty</label>
+          <input id="website" name="website" type="text" tabindex="-1" autocomplete="off">
+        </div>
+
+        <div id="widget"></div>
+        <button id="submit" type="submit" disabled>Send</button>
+        <div id="status" role="status" aria-live="polite"></div>
+      </form>
     </main>
+    <script>
+      (function () {
+        var MESSAGES = {
+          INVALID_INPUT: "Please check your input and try again.",
+          VERIFICATION_FAILED: "Verification failed. Please complete the challenge again.",
+          TRY_LATER: "The service is busy. Please try again later.",
+          SEND_FAILED: "Your message could not be sent. Please try again later.",
+          LOAD_FAILED: "Verification could not be loaded. Check your connection or content blockers, then reload this page.",
+          GENERIC: "Something went wrong. Please try again.",
+          SUCCESS: "Thank you. Your message has been sent."
+        };
+        var app = document.getElementById("app");
+        var form = document.getElementById("form");
+        var button = document.getElementById("submit");
+        var statusBox = document.getElementById("status");
+        var widgetId = null;
+        var token = "";
+        var pending = false;
+
+        function setStatus(text, kind) {
+          statusBox.textContent = text;
+          statusBox.className = kind || "";
+        }
+        function refreshButton() {
+          button.disabled = pending || token === "";
+        }
+        function resetChallenge() {
+          token = "";
+          refreshButton();
+          if (widgetId !== null && window.turnstile) {
+            window.turnstile.reset(widgetId);
+          }
+        }
+        function finish(message, kind, clearFields) {
+          pending = false;
+          if (clearFields) {
+            form.reset();
+          }
+          setStatus(message, kind);
+          resetChallenge();
+        }
+
+        function loadFailed() {
+          if (widgetId === null) {
+            setStatus(MESSAGES.LOAD_FAILED, "error");
+          }
+        }
+        window.onTurnstileLoadError = loadFailed;
+        // Covers a script that hangs instead of failing outright.
+        window.setTimeout(loadFailed, 15000);
+
+        window.onTurnstileLoad = function () {
+          widgetId = window.turnstile.render("#widget", {
+            sitekey: app.getAttribute("data-sitekey"),
+            action: app.getAttribute("data-action"),
+            callback: function (value) {
+              token = value;
+              refreshButton();
+            },
+            "expired-callback": function () {
+              resetChallenge();
+              setStatus(MESSAGES.VERIFICATION_FAILED, "error");
+            },
+            "error-callback": function () {
+              resetChallenge();
+              setStatus(MESSAGES.VERIFICATION_FAILED, "error");
+            }
+          });
+        };
+
+        form.addEventListener("submit", function (event) {
+          event.preventDefault();
+          if (pending || token === "") {
+            return;
+          }
+          if (!form.checkValidity()) {
+            form.reportValidity();
+            return;
+          }
+          var payload = {
+            name: form.elements.name.value,
+            email: form.elements.email.value,
+            subject: form.elements.subject.value,
+            message: form.elements.message.value,
+            website: form.elements.website.value,
+            turnstileToken: token
+          };
+          // Tokens are single-use: drop it now so a second click cannot reuse it.
+          token = "";
+          pending = true;
+          refreshButton();
+          setStatus("Sending...", "");
+          google.script.run
+            .withSuccessHandler(function (result) {
+              if (result && result.ok === true) {
+                finish(MESSAGES.SUCCESS, "success", true);
+              } else {
+                var code = result && result.code;
+                finish(MESSAGES[code] && ["INVALID_INPUT", "VERIFICATION_FAILED", "TRY_LATER", "SEND_FAILED"].indexOf(code) !== -1 ? MESSAGES[code] : MESSAGES.GENERIC, "error", false);
+              }
+            })
+            .withFailureHandler(function () {
+              finish(MESSAGES.GENERIC, "error", false);
+            })
+            .submitInquiry(payload);
+        });
+      })();
+    </script>
+    <script src="https://challenges.cloudflare.com/turnstile/v0/api.js?onload=onTurnstileLoad&amp;render=explicit" async defer onerror="onTurnstileLoadError()"></script>
   </body>
 </html>
