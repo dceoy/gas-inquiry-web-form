@@ -337,3 +337,15 @@ test("contention: a request arriving while the lock is held is refused, never in
   assert.equal(gas.store.get("RL_VERIFY"), "2026-10-09T12:34:1");
   assert.equal(gas.state.lockHeld, false);
 });
+
+test("window boundary crossed while waiting for the lock cannot rewind the bucket", () => {
+  const gas = createGas({ ...GOOD_PROPERTIES, MAX_VERIFY_PER_MINUTE: "1" });
+  gas.store.set("RL_VERIFY", "2026-10-09T12:35:1");
+  // The request starts in minute 12:34 but the lock wait ends in 12:35.
+  gas.state.onTryLock = () => {
+    gas.state.now = "2026-10-09T12:35:30.000Z";
+  };
+  assert.deepEqual(gas.submit(valid), { ok: false, code: "TRY_LATER" });
+  assert.equal(gas.store.get("RL_VERIFY"), "2026-10-09T12:35:1");
+  assert.equal(gas.fetchCalls.length, 0);
+});

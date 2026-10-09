@@ -60,6 +60,7 @@ export function createGas(
     now,
     fetchReplies: [] as FetchReply[],
     fetchDefault: { body: SITEVERIFY_OK } as FetchReply,
+    onTryLock: undefined as undefined | (() => void),
     onFetch: undefined as undefined | (() => void),
     onCounterRead: undefined as undefined | (() => void),
   };
@@ -127,6 +128,7 @@ export function createGas(
     LockService: {
       getScriptLock: () => ({
         tryLock() {
+          state.onTryLock?.();
           if (!state.lockAvailable || state.lockHeld) {
             return false;
           }

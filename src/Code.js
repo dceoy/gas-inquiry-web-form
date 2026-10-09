@@ -81,7 +81,7 @@ function submitInquiry(payload) {
     }
     const config = loadConfig_();
 
-    if (!reserve_("RL_VERIFY", minuteBucket_(), config.maxVerifyPerMinute)) {
+    if (!reserve_("RL_VERIFY", minuteBucket_, config.maxVerifyPerMinute)) {
       return fail_("TRY_LATER", "verify_limit");
     }
     const verdict = verifyTurnstile_(fields.turnstileToken, config);
@@ -95,7 +95,7 @@ function submitInquiry(payload) {
     if (MailApp.getRemainingDailyQuota() < 1) {
       return fail_("TRY_LATER", "mail_quota");
     }
-    if (!reserve_("RL_MAIL", dayBucket_(), config.maxMailPerDay)) {
+    if (!reserve_("RL_MAIL", dayBucket_, config.maxMailPerDay)) {
       return fail_("TRY_LATER", "mail_limit");
     }
     try {
@@ -290,17 +290,21 @@ function dayBucket_() {
 
 /**
  * Atomically reserve one attempt in a fixed-window counter stored as
- * "<bucket>:<count>" in a Script Property. The lock is held only around the
+ * "<bucket>:<count>" in a Script Property; `bucketOf` returns the current
+ * window id and is called under the lock. The lock is held only around the
  * counter update, never around an external call. Returns false when the limit
  * is reached; throws on lock or state failure (callers fail closed). Failed
  * attempts stay counted: reservations are never refunded.
  */
-function reserve_(key, bucket, limit) {
+function reserve_(key, bucketOf, limit) {
   const lock = LockService.getScriptLock();
   if (!lock.tryLock(LOCK_WAIT_MS)) {
     throw new Error("lock unavailable");
   }
   try {
+    // Evaluate the window only after the lock wait so a boundary crossed while
+    // waiting cannot overwrite a newer bucket with an older one.
+    const bucket = bucketOf();
     const properties = PropertiesService.getScriptProperties();
     const stored = properties.getProperty(key);
     let count = 0;
