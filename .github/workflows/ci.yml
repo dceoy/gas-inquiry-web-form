@@ -1,0 +1,34 @@
+---
+name: CI
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+    types:
+      - opened
+      - synchronize
+      - reopened
+  workflow_dispatch:  # checkov:skip=CKV_GHA_7:Manual CI runs do not require inputs
+permissions:
+  contents: read
+jobs:
+  package-lint-and-test:
+    permissions:
+      contents: read
+    uses: dceoy/gha-for-devops/.github/workflows/typescript-package-script.yml@main  # zizmor: ignore[unpinned-uses]
+    with:
+      package-scripts: format:check,lint,typecheck,test
+      package-path: .
+      node-version: latest
+      audit: true
+  github-actions-lint-and-scan:
+    permissions:
+      contents: read
+      actions: read
+      security-events: write
+    uses: dceoy/gha-for-devops/.github/workflows/github-actions-lint-and-scan.yml@main  # zizmor: ignore[unpinned-uses]
+    with:
+      search-path: .github/workflows

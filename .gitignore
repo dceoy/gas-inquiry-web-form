@@ -147,3 +147,7 @@ vite.config.ts.timestamp-*
 
 # Turbo Repo
 .turbo
+
+# Local Google Apps Script identifiers and OAuth tokens
+.clasp.json
+.clasprc.json
