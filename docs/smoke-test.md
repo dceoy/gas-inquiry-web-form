@@ -18,14 +18,14 @@ check or remove Turnstile.
 
 ## Record
 
-| Field | Value |
-| --- | --- |
-| Date | |
-| Test project / version / deployment | |
-| Browsers and sessions | |
-| Siteverify `hostname` (sanitized) | |
-| Siteverify `action` | |
-| Hostname stable across reloads / other browser / version update? | |
+| Field                                                            | Value |
+| ---------------------------------------------------------------- | ----- |
+| Date                                                             |       |
+| Test project / version / deployment                              |       |
+| Browsers and sessions                                            |       |
+| Siteverify `hostname` (sanitized)                                |       |
+| Siteverify `action`                                              |       |
+| Hostname stable across reloads / other browser / version update? |       |
 
 ## Checklist
 
