@@ -32,14 +32,14 @@ The behavior and safeguards follow
 
 ### Validation
 
-| Field | Requirement |
-| --- | --- |
-| `name` | optional, ≤ 100 chars after trim |
-| `email` | 1–320 chars, one bare address; no whitespace/control chars, `,;<>():"\` |
-| `subject` | 1–150 chars after trim; any control char (CR/LF…) in the raw value is rejected |
-| `message` | 1–2000 chars after trim; internal newlines preserved |
-| `turnstileToken` | opaque, 1–2048 chars, no whitespace; never altered |
-| `website` | honeypot, must be empty or omitted |
+| Field            | Requirement                                                                    |
+| ---------------- | ------------------------------------------------------------------------------ |
+| `name`           | optional, ≤ 100 chars after trim                                               |
+| `email`          | 1–320 chars, one bare address; no whitespace/control chars, `,;<>():"\`        |
+| `subject`        | 1–150 chars after trim; any control char (CR/LF…) in the raw value is rejected |
+| `message`        | 1–2000 chars after trim; internal newlines preserved                           |
+| `turnstileToken` | opaque, 1–2048 chars, no whitespace; never altered                             |
+| `website`        | honeypot, must be empty or omitted                                             |
 
 Unexpected fields, non-string values, raw fields over their caps, and a
 serialized payload over 16 KiB (UTF-8) are rejected before any external call.
@@ -75,15 +75,15 @@ and production. Deployments of one project share Script Properties and counters.
 3. Create a Turnstile widget (use a real widget, not dummy keys) and set
    **Script Properties** (Project Settings → Script Properties):
 
-   | Property | Meaning |
-   | --- | --- |
-   | `EMAIL_TO` | the one fixed recipient address |
-   | `TURNSTILE_SITE_KEY` | widget sitekey (exposed to the browser) |
-   | `TURNSTILE_SECRET_KEY` | widget secret (server only) |
-   | `TURNSTILE_ACTION` | widget action, `[A-Za-z0-9_-]{1,32}` |
-   | `TURNSTILE_HOSTNAMES` | comma-separated **exact** hostnames Siteverify may report |
-   | `MAX_VERIFY_PER_MINUTE` | optional positive integer, default 10 |
-   | `MAX_MAIL_PER_DAY` | optional positive integer, default 20 |
+   | Property                | Meaning                                                   |
+   | ----------------------- | --------------------------------------------------------- |
+   | `EMAIL_TO`              | the one fixed recipient address                           |
+   | `TURNSTILE_SITE_KEY`    | widget sitekey (exposed to the browser)                   |
+   | `TURNSTILE_SECRET_KEY`  | widget secret (server only)                               |
+   | `TURNSTILE_ACTION`      | widget action, `[A-Za-z0-9_-]{1,32}`                      |
+   | `TURNSTILE_HOSTNAMES`   | comma-separated **exact** hostnames Siteverify may report |
+   | `MAX_VERIFY_PER_MINUTE` | optional positive integer, default 10                     |
+   | `MAX_MAIL_PER_DAY`      | optional positive integer, default 20                     |
 
    Empty or malformed values (including a bad override) fail closed. Hostnames
    are lowercased and compared exactly; wildcards, URLs and paths are rejected.
@@ -91,6 +91,7 @@ and production. Deployments of one project share Script Properties and counters.
    replace this check. `TURNSTILE_HOSTNAMES` must come from smoke-test evidence
    (see below); do not approve all of `googleusercontent.com` or
    `script.google.com`.
+
 4. In the editor, run `submitInquiry` once (or any function) as the deployer to
    authorize the two scopes: `script.send_mail` and `script.external_request`.
    No Gmail inbox access is requested.
