@@ -1,3 +1,4 @@
+# No patched braces release is available for this advisory; revisit when upstream resolves it.
 audit:
   ignore:
     - GHSA-vfj7-8cjw-p6xm
