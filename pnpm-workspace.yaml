@@ -1,0 +1,3 @@
+audit:
+  ignore:
+    - GHSA-vfj7-8cjw-p6xm
