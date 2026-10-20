@@ -13,8 +13,8 @@
     "audit:fix": "pnpm audit --fix=override",
     "lint": "oxlint .",
     "lint:fix": "oxlint --fix .",
-    "format": "biome format --write .",
-    "format:check": "biome format .",
+    "format": "biome format --write . && oxfmt --write '**/*.{md,mdx}' --no-error-on-unmatched-pattern",
+    "format:check": "biome format . && oxfmt --check '**/*.{md,mdx}' --no-error-on-unmatched-pattern",
     "typecheck": "tsc --noEmit",
     "test": "node --test tests/*.test.ts",
     "push": "clasp push",
@@ -36,6 +36,7 @@
     "@biomejs/biome": "^2.5.15",
     "@google/clasp": "3.4.1",
     "@types/node": "26.6.5",
+    "oxfmt": "^0.72.0",
     "oxlint": "^1.87.0",
     "typescript": "7.0.2"
   }
