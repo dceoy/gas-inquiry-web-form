@@ -14,7 +14,7 @@
     "lint": "oxlint .",
     "lint:fix": "oxlint --fix .",
     "format": "biome format --write . && oxfmt --write '**/*.{md,mdx}' --no-error-on-unmatched-pattern",
-    "format:check": "biome format . && oxfmt --check '**/*.{md,mdx}' --no-error-on-unmatched-pattern",
+    "format:check": "biome format . && oxfmt --write '**/*.{md,mdx}' --no-error-on-unmatched-pattern && git --no-pager diff --no-color",
     "typecheck": "tsc --noEmit",
     "test": "node --test tests/*.test.ts",
     "push": "clasp push",
