@@ -3,3 +3,10 @@ minimumReleaseAge: 1440
 audit:
   ignore:
     - GHSA-vfj7-8cjw-p6xm
+
+overrides:
+  '@modelcontextprotocol/sdk@<1.32.0': ^1.32.0
+  '@modelcontextprotocol/sdk@>=1.24.0 <1.32.0': ^1.32.0
+  '@modelcontextprotocol/sdk@>=1.3.0 <1.32.0': ^1.32.0
+  '@modelcontextprotocol/sdk@>=1.6.0 <1.32.0': ^1.32.0
+  ip-address@<=10.7.3: ^10.7.4
