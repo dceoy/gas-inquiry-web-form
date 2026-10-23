@@ -1,3 +1,4 @@
+minimumReleaseAge: 1440
 # No patched braces release is available for this advisory; revisit when upstream resolves it.
 audit:
   ignore:
