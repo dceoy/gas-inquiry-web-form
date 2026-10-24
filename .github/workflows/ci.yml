@@ -11,14 +11,14 @@ on:
       - opened
       - synchronize
       - reopened
-  workflow_dispatch:  # checkov:skip=CKV_GHA_7:Manual CI runs do not require inputs
+  workflow_dispatch: # checkov:skip=CKV_GHA_7:Manual CI runs do not require inputs
 permissions:
   contents: read
 jobs:
   package-lint-and-test:
     permissions:
       contents: read
-    uses: dceoy/gha-for-devops/.github/workflows/typescript-package-script.yml@main  # zizmor: ignore[unpinned-uses]
+    uses: dceoy/gha-for-devops/.github/workflows/typescript-package-script.yml@main # zizmor: ignore[unpinned-uses]
     with:
       package-scripts: format:check,lint,typecheck,test
       package-path: .
@@ -28,7 +28,7 @@ jobs:
       contents: read
       actions: read
       security-events: write
-    uses: dceoy/gha-for-devops/.github/workflows/github-actions-lint-and-scan.yml@main  # zizmor: ignore[unpinned-uses]
+    uses: dceoy/gha-for-devops/.github/workflows/github-actions-lint-and-scan.yml@main # zizmor: ignore[unpinned-uses]
     with:
       search-path: .github/workflows
   dependabot-auto-merge:
@@ -37,7 +37,7 @@ jobs:
     needs:
       - package-lint-and-test
       - github-actions-lint-and-scan
-    uses: dceoy/gha-for-devops/.github/workflows/dependabot-auto-merge.yml@main  # zizmor: ignore[unpinned-uses]
+    uses: dceoy/gha-for-devops/.github/workflows/dependabot-auto-merge.yml@main # zizmor: ignore[unpinned-uses]
     permissions:
       contents: write
       pull-requests: write
