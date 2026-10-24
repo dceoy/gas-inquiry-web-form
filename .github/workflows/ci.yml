@@ -22,7 +22,6 @@ jobs:
     with:
       package-scripts: format:check,lint,typecheck,test
       package-path: .
-      node-version: latest
       audit: true
   github-actions-lint-and-scan:
     permissions:
