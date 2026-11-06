@@ -33,7 +33,7 @@ jobs:
       search-path: .github/workflows
   dependabot-auto-merge:
     if: >
-      github.event_name == 'pull_request' && github.actor == 'dependabot[bot]'
+      github.event_name == 'pull_request' && github.event.pull_request.user.login == 'dependabot[bot]'
     needs:
       - package-lint-and-test
       - github-actions-lint-and-scan
